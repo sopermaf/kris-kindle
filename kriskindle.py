@@ -27,14 +27,17 @@ def sendEmail(emailAddr, emailContent):
 
 def assignSantas(participants):
     '''Shuffles participants and assigns names.
-    Changes dictionary in place.
+
+    After shuffle, names are assigned pointing
+    to the next person in the list in a circular
+    fashion so that the last points back to the first
+    ensuring a chain of gift giving when taking turns.
     '''
     random.shuffle(participants)
-
     numParticipants = len(participants)
-    for i in range(0, numParticipants):
-        assignedIndex = i + 1 if i + 1 < numParticipants else 0
-        assignedName = participants[assignedIndex]['name']
+
+    for i in range(numParticipants):
+        assignedName = participants[i % numParticipants]['name']
         participants[i]['assigned'] = assignedName
         
 
