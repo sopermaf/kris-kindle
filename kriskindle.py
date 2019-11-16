@@ -1,28 +1,28 @@
 import random
 import json
 from string import Template
+from datetime import datetime
+import getpass
+import smtplib
+import kriskindle_config as kk_config
 
-emailMsgTemplate = Template('Dear $secretSanta,\nYou will be buying a present for $assigned this year!')
+mainMsgTemplate = Template('Dear $secretSanta,\nYou will be buying a present for $assigned this year!')
 
-
-def writeEmail(assignedName, secretSantaName):
+def writeEmail(assignedName, secretSantaName, secretSantaEmail):
     '''Creates the email body which will be 
     sent as the email to the secret santa
     to inform them who they will be buying
     a present for.
     '''
-    return emailMsgTemplate.substitute(
-                secretSanta=secretSantaName,
-                assigned=assignedName,
-            )
-
-
-def sendEmail(emailAddr, emailContent):
-    '''
-    Send an email to the to the specified
-    address with the specified content
-    '''
-    pass
+    currYear = datetime.now().year
+    msg = "\r\n".join([
+        "From: %s" % kk_config.KRIS_KINDLE_EMAIL,
+        "To: %s" % secretSantaEmail,
+        "Subject: Kris Kindle %s" %currYear,
+        "",
+        mainMsgTemplate.substitute(secretSanta=secretSantaName, assigned=assignedName)
+    ])
+    return msg
 
 
 def assignSantas(participants):
@@ -37,9 +37,9 @@ def assignSantas(participants):
     numParticipants = len(participants)
 
     for i in range(numParticipants):
-        assignedName = participants[i % numParticipants]['name']
+        assignedName = participants[(i + 1) % numParticipants]['name']
         participants[i]['assigned'] = assignedName
-        
+
 
 def runKrisKindle(participants):
     '''
@@ -50,15 +50,23 @@ def runKrisKindle(participants):
     '''
     assignSantas(participants)
 
+    # login to email
+    server = smtplib.SMTP('smtp.gmail.com:587')
+    server.ehlo()
+    server.starttls()
+
+    # get password to login
+    password = getpass.getpass(f"Enter password to login to {kk_config.KRIS_KINDLE_EMAIL}:\n")
+    server.login(kk_config.KRIS_KINDLE_EMAIL,password)
+
     for ind in participants:
-        emailContent = writeEmail(ind['assigned'], ind['name'])
-        print(emailContent)
-        # send
+        emailContent = writeEmail(ind['assigned'], ind['name'], ind['email'])
+        server.sendmail(kk_config.KRIS_KINDLE_EMAIL, ind['email'], emailContent)
+        print(f"Sent email to \"{ind['name']}\" at email address \"{ind['email']}\"")
     
+    # close connection
+    server.close()
 
-        
-
-    
 
 if __name__ == '__main__':
     with open("env/users.json") as users_file:
