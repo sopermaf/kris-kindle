@@ -69,7 +69,7 @@ def runKrisKindle(participants):
     emails to each secret santa.
     '''
     assignSantas(participants)
-    server = loginSMTPEmail('smtp.gmail.com:587', kk_config.KRIS_KINDLE_EMAIL)
+    server = loginSMTPEmail(kk_config.SMTP_SERVER_ADDR, kk_config.KRIS_KINDLE_EMAIL)
 
     for ind in participants:
         emailContent = writeEmail(ind['assigned'], ind['name'], ind['email'])
