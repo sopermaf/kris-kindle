@@ -25,6 +25,26 @@ def writeEmail(assignedName, secretSantaName, secretSantaEmail):
     return msg
 
 
+def loginSMTPEmail(serverAddress, accountEmail):
+    '''Login to the email account on the specified 
+    SMTP server and prompt the user for a password.
+
+    Returns the SMTP server
+    '''
+    # conncect to SMTP server
+    serverSMTP = smtplib.SMTP(serverAddress)
+    serverSMTP.ehlo()
+    serverSMTP.starttls()
+
+    # login to the server
+    password = getpass.getpass(
+                    f"Enter password to login to {accountEmail}:\n"
+                )
+    serverSMTP.login(accountEmail, password)
+
+    return serverSMTP
+
+
 def assignSantas(participants):
     '''Shuffles participants and assigns names.
 
@@ -49,15 +69,7 @@ def runKrisKindle(participants):
     emails to each secret santa.
     '''
     assignSantas(participants)
-
-    # login to email
-    server = smtplib.SMTP('smtp.gmail.com:587')
-    server.ehlo()
-    server.starttls()
-
-    # get password to login
-    password = getpass.getpass(f"Enter password to login to {kk_config.KRIS_KINDLE_EMAIL}:\n")
-    server.login(kk_config.KRIS_KINDLE_EMAIL,password)
+    server = loginSMTPEmail('smtp.gmail.com:587', kk_config.KRIS_KINDLE_EMAIL)
 
     for ind in participants:
         emailContent = writeEmail(ind['assigned'], ind['name'], ind['email'])
