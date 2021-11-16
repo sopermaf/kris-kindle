@@ -3,6 +3,5 @@ __pycache__/
 *.ipynb
 
 # hide the user information
-env/
 kriskindle_config.py
 *.env
