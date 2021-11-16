@@ -5,3 +5,4 @@ __pycache__/
 # hide the user information
 env/
 kriskindle_config.py
+*.env
