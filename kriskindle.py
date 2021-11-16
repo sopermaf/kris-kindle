@@ -1,5 +1,6 @@
 import csv
 import getpass
+import itertools
 import os
 import random
 import smtplib
@@ -23,9 +24,9 @@ def writeEmail(assignedName, secretSantaName, secretSantaEmail):
     currYear = datetime.now().year
     msg = "\r\n".join(
         [
-            "From: %s" % KRIS_KINDLE_EMAIL,
-            "To: %s" % secretSantaEmail,
-            "Subject: Kris Kindle %s" % currYear,
+            f"From: {KRIS_KINDLE_EMAIL}",
+            f"To: {secretSantaEmail}",
+            f"Subject: Kris Kindle {currYear}",
             "",
             mainMsgTemplate.substitute(
                 secretSanta=secretSantaName, assigned=assignedName
@@ -61,12 +62,15 @@ def assignSantas(participants):
     fashion so that the last points back to the first
     ensuring a chain of gift giving when taking turns.
     """
+    # ensures not in order of input file
     random.shuffle(participants)
-    numParticipants = len(participants)
 
-    for i in range(numParticipants):
-        assignedName = participants[(i + 1) % numParticipants]["name"]
-        participants[i]["assigned"] = assignedName
+    # shifts one ahead in participants names for cirucular gift exchange
+    names = itertools.cycle(p["name"] for p in participants)
+    next(names)
+
+    for person, assigned in zip(participants, names):
+        person["assigned"] = assigned
 
 
 def runKrisKindle(participants):
@@ -76,8 +80,9 @@ def runKrisKindle(participants):
     and emails and then sending secret
     emails to each secret santa.
     """
-    assignSantas(participants)
     server = loginSMTPEmail(SMTP_SERVER_ADDR, KRIS_KINDLE_EMAIL)
+
+    assignSantas(participants)
 
     for ind in participants:
         emailContent = writeEmail(ind["assigned"], ind["name"], ind["email"])
