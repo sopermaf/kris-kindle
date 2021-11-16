@@ -1,5 +1,5 @@
+import csv
 import getpass
-import json
 import os
 import random
 import smtplib
@@ -89,7 +89,7 @@ def runKrisKindle(participants):
 
 
 if __name__ == "__main__":
-    with open("users.json") as users_file:
-        users = json.load(users_file)
+    with open("users.csv") as users_file:
+        users = list(csv.DictReader(users_file))
 
     runKrisKindle(users)
