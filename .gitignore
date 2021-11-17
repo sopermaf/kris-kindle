@@ -4,4 +4,4 @@ __pycache__/
 
 # hide the user information
 *.env
-users.csv
+*.csv
