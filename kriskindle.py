@@ -3,8 +3,10 @@ import getpass
 import itertools
 import os
 import random
+import re
 import smtplib
 from datetime import datetime
+from operator import itemgetter
 from string import Template
 
 mainMsgTemplate = Template(
@@ -96,8 +98,20 @@ def runKrisKindle(participants):
     server.close()
 
 
+def validate_email_addr(*emails):
+    """
+    Ensure emails match basic email formatting to catch
+    easy data errors
+    """
+    email_regex = re.compile(r"[^@\s]+@[^@\s]+\.[a-zA-Z0-9]+$")
+    invalid_emails = list(itertools.filterfalse(email_regex.match, emails))
+    if invalid_emails:
+        raise ValueError(f"Invalid emails: {emails}")
+
+
 if __name__ == "__main__":
     with open("users.csv") as users_file:
         users = list(csv.DictReader(users_file))
 
+    validate_email_addr(*map(itemgetter("email"), users))
     runKrisKindle(users)
