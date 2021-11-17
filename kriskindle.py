@@ -72,6 +72,9 @@ def assignSantas(participants):
     for person, assigned in zip(participants, names):
         person["assigned"] = assigned
 
+    # ensure output doesn't reveal the circular order
+    random.shuffle(participants)
+
 
 def runKrisKindle(participants):
     """
