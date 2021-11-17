@@ -5,6 +5,7 @@ import os
 import random
 import re
 import smtplib
+import sys
 from datetime import datetime
 from operator import itemgetter
 from string import Template
@@ -110,8 +111,13 @@ def validate_email_addr(*emails):
 
 
 if __name__ == "__main__":
-    with open("users.csv") as users_file:
+    # setup csv file to run
+    filename = sys.argv[1] if len(sys.argv) > 1 else "users.csv"
+    with open(filename) as users_file:
         users = list(csv.DictReader(users_file))
 
+    # ensure data correct
     validate_email_addr(*map(itemgetter("email"), users))
+
+    # run main kriskindle logic
     runKrisKindle(users)
