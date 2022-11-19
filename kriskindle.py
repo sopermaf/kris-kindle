@@ -73,6 +73,8 @@ def assignSantas(participants):
     next(names)
 
     for person, assigned in zip(participants, names):
+        if person["name"] == assigned:
+            raise ValueError("Self assigned for gift")
         person["assigned"] = assigned
 
     # ensure output doesn't reveal the circular order
